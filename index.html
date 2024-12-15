@@ -6,18 +6,18 @@
     <title>Hola Mundo</title>
 </head>
 <body>
-    <h1>Hola Mundo</h1>
-    <p>¡Bienvenido a tu primera página en HTML en el puerto 8080, !</p>
+    <h1>Programación Distribuida</h1>
+    <h2>Sistemas de Información</h2>
     
-    <!-- Mostrar dirección IPv4 pública -->
-    <p>Esta página se está sirviendo desde la dirección IPv4 pública: <strong id="instance-ip">Cargando...</strong></p>
+    <!-- Mostrar la IP pública de la instancia -->
+    <h1>Hola Mundo desde la dirección IP pública: <strong id="instance-ip">Cargando...</strong></h1>
 
     <script>
-      // Obtener la dirección IPv4 pública de la instancia
+      // Obtener la dirección IPv4 pública de la instancia EC2
       fetch('http://169.254.169.254/latest/meta-data/public-ipv4')
         .then(response => response.text())
         .then(ip => {
-          // Insertar la IP en el lugar correspondiente
+          // Insertar la IP pública en el lugar correspondiente
           document.getElementById('instance-ip').textContent = ip;
         })
         .catch(error => {

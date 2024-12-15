@@ -12,7 +12,7 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
       with:
-        repository: "https://github.com/MarcosSuntaxi/HelloWorldHTML.git"
+        repository: "MarcosSuntaxi/HelloWorldHTML"
 
     - name: Set up SSH Key
       run: |
@@ -21,15 +21,15 @@ jobs:
 
     - name: Prepare EC2 Target Directory
       run: |
-        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-54-88-77-127.compute-1.amazonaws.com "mkdir -p /home/ubuntu/project"
+        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-52-90-38-140.compute-1.amazonaws.com "mkdir -p /home/ubuntu/project"
 
     - name: Copy Project Files to EC2
       run: |
-        scp -o StrictHostKeyChecking=no -i private-key.pem -r ./* ubuntu@ec2-54-88-77-127.compute-1.amazonaws.com:/home/ubuntu/project/
+        scp -o StrictHostKeyChecking=no -i private-key.pem -r ./* ubuntu@ec2-52-90-38-140.compute-1.amazonaws.com:/home/ubuntu/project/
 
     - name: Deploy Application on EC2
       run: |
-        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-54-88-77-127.compute-1.amazonaws.com << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-52-90-38-140.compute-1.amazonaws.com << 'EOF'
           # Update and install necessary packages
           sudo apt update -y
           sudo apt install nginx git -y
@@ -48,4 +48,4 @@ jobs:
 
     - name: Verify Deployment
       run: |
-        curl http://ec2-54-88-77-127.compute-1.amazonaws.com
+        curl http://ec2-52-90-38-140.compute-1.amazonaws.com

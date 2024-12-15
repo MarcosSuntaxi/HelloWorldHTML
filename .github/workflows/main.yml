@@ -3,37 +3,41 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main  # O la rama que estés utilizando
+      - main  # O la rama que estás utilizando
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+    # 1. Clonar el repositorio
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    # 2. Configurar SSH
     - name: Set up SSH
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
 
-    - name: Copy files to EC2
+    # 3. Copiar archivos del repositorio a la instancia EC2
+    - name: Copy repository to EC2
       run: |
-        scp -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} -r ./index.html ec2-user@ec2-52-90-38-140.compute-1.amazonaws.com:/home/ec2-user/hello-world/
+        scp -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} -r ./* ec2-54-88-77-127.compute-1.amazonaws.com:/home/ec2-user/hello-world/
 
+    # 4. SSH en EC2 para configurar y desplegar
     - name: SSH into EC2 and deploy
       run: |
-        ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} ec2-user@ec2-52-90-38-140.compute-1.amazonaws.com << 'EOF'
-          # Instalar Nginx si no está instalado
+        ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} ec2-54-88-77-127.compute-1.amazonaws.com << 'EOF'
+          # Actualizar sistema e instalar Nginx
           sudo yum update -y
           sudo amazon-linux-extras enable nginx1
           sudo yum install nginx -y
           
-          # Copiar los archivos HTML al directorio correcto
-          sudo cp /home/ec2-user/hello-world/index.html /usr/share/nginx/html/index.html
+          # Mover archivos al directorio web de Nginx
+          sudo cp -r /home/ec2-user/hello-world/* /usr/share/nginx/html/
           
-          # Iniciar Nginx
+          # Iniciar y habilitar Nginx
           sudo systemctl start nginx
           sudo systemctl enable nginx
           
@@ -41,6 +45,7 @@ jobs:
           sudo systemctl restart nginx
         EOF
 
+    # 5. Verificar despliegue
     - name: Verify deployment
       run: |
-        curl http://ec2-52-90-38-140.compute-1.amazonaws.com
+        curl http://ec2-54-88-77-127.compute-1.amazonaws.com:8080

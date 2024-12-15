@@ -8,6 +8,20 @@
 <body>
     <h1>Hola Mundo</h1>
     <p>¡Bienvenido a tu primera página en HTML en el puerto 8080, !</p>
+    
+    <!-- Mostrar instancia -->
+    <p>Esta página se está sirviendo desde la instancia: <strong>{{INSTANCE_ID}}</strong></p>
+
+    <script>
+      // Reemplazar {{INSTANCE_ID}} con el nombre de la instancia en el backend
+      fetch('/instance-id')
+        .then(response => response.text())
+        .then(instanceId => {
+          document.querySelector('strong').textContent = instanceId;
+        })
+        .catch(error => {
+          console.error('Error obteniendo el ID de la instancia:', error);
+        });
+    </script>
 </body>
 </html>
-

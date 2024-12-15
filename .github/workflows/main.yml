@@ -1,51 +1,51 @@
-name: Deploy to EC2
+name: Deploy GitHub Project to EC2
 
 on:
   push:
-    branches:
-      - main  # O la rama que estás utilizando
+    branches: [ main ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Clonar el repositorio
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    # 2. Configurar SSH
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.3
+    - name: Checkout Repository
+      uses: actions/checkout@v3
       with:
-        ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        repository: "https://github.com/MarcosSuntaxi/HelloWorldHTML.git"
 
-    # 3. Copiar archivos del repositorio a la instancia EC2
-    - name: Copy repository to EC2
+    - name: Set up SSH Key
       run: |
-        scp -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} -r ./* ec2-54-88-77-127.compute-1.amazonaws.com:/home/ec2-user/hello-world/
+        echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > private-key.pem
+        chmod 600 private-key.pem
 
-    # 4. SSH en EC2 para configurar y desplegar
-    - name: SSH into EC2 and deploy
+    - name: Prepare EC2 Target Directory
       run: |
-        ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} ec2-54-88-77-127.compute-1.amazonaws.com << 'EOF'
-          # Actualizar sistema e instalar Nginx
-          sudo yum update -y
-          sudo amazon-linux-extras enable nginx1
-          sudo yum install nginx -y
-          
-          # Mover archivos al directorio web de Nginx
-          sudo cp -r /home/ec2-user/hello-world/* /usr/share/nginx/html/
-          
-          # Iniciar y habilitar Nginx
+        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-54-88-77-127.compute-1.amazonaws.com "mkdir -p /home/ubuntu/project"
+
+    - name: Copy Project Files to EC2
+      run: |
+        scp -o StrictHostKeyChecking=no -i private-key.pem -r ./* ubuntu@ec2-54-88-77-127.compute-1.amazonaws.com:/home/ubuntu/project/
+
+    - name: Deploy Application on EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-54-88-77-127.compute-1.amazonaws.com << 'EOF'
+          # Update and install necessary packages
+          sudo apt update -y
+          sudo apt install nginx git -y
+
+          # Clone the repository
+          cd /home/ubuntu/project
+          git clone https://github.com/MarcosSuntaxi/HelloWorldHTML.git .
+
+          # Copy project files to the Nginx root directory
+          sudo cp -r /home/ubuntu/project/* /var/www/html/
+
+          # Start and enable Nginx
           sudo systemctl start nginx
           sudo systemctl enable nginx
-          
-          # Reiniciar Nginx para aplicar cambios
-          sudo systemctl restart nginx
         EOF
 
-    # 5. Verificar despliegue
-    - name: Verify deployment
+    - name: Verify Deployment
       run: |
-        curl http://ec2-54-88-77-127.compute-1.amazonaws.com:8080
+        curl http://ec2-54-88-77-127.compute-1.amazonaws.com

@@ -19,15 +19,18 @@ jobs:
         echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > private-key.pem
         chmod 600 private-key.pem
 
-    - name: Prepare EC2 Target Directory
+    # Preparar la primera instancia EC2
+    - name: Prepare EC2 Target Directory (Instance 1)
       run: |
         ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-54-224-204-67.compute-1.amazonaws.com "mkdir -p /home/ubuntu/project"
 
-    - name: Copy Project Files to EC2
+    # Copiar los archivos a la primera instancia EC2
+    - name: Copy Project Files to EC2 (Instance 1)
       run: |
         scp -o StrictHostKeyChecking=no -i private-key.pem -r ./* ubuntu@ec2-54-224-204-67.compute-1.amazonaws.com:/home/ubuntu/project/
 
-    - name: Deploy Application on EC2
+    # Desplegar aplicación en la primera instancia EC2
+    - name: Deploy Application on EC2 (Instance 1)
       run: |
         ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-54-224-204-67.compute-1.amazonaws.com << 'EOF'
           # Update and install necessary packages
@@ -46,6 +49,42 @@ jobs:
           sudo systemctl enable nginx
         EOF
 
-    - name: Verify Deployment
+    # Verificar despliegue en la primera instancia EC2
+    - name: Verify Deployment (Instance 1)
       run: |
         curl http://ec2-54-224-204-67.compute-1.amazonaws.com
+
+    # Preparar la segunda instancia EC2
+    - name: Prepare EC2 Target Directory (Instance 2)
+      run: |
+        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-52-22-29-222.compute-1.amazonaws.com "mkdir -p /home/ubuntu/project"
+
+    # Copiar los archivos a la segunda instancia EC2
+    - name: Copy Project Files to EC2 (Instance 2)
+      run: |
+        scp -o StrictHostKeyChecking=no -i private-key.pem -r ./* ubuntu@ec2-52-22-29-222.compute-1.amazonaws.com:/home/ubuntu/project/
+
+    # Desplegar aplicación en la segunda instancia EC2
+    - name: Deploy Application on EC2 (Instance 2)
+      run: |
+        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-52-22-29-222.compute-1.amazonaws.com << 'EOF'
+          # Update and install necessary packages
+          sudo apt update -y
+          sudo apt install nginx git -y
+
+          # Clone the repository
+          cd /home/ubuntu/project
+          git clone https://github.com/MarcosSuntaxi/HelloWorldHTML.git .
+
+          # Copy project files to the Nginx root directory
+          sudo cp -r /home/ubuntu/project/* /var/www/html/
+
+          # Start and enable Nginx
+          sudo systemctl start nginx
+          sudo systemctl enable nginx
+        EOF
+
+    # Verificar despliegue en la segunda instancia EC2
+    - name: Verify Deployment (Instance 2)
+      run: |
+        curl http://ec2-52-22-29-222.compute-1.amazonaws.com

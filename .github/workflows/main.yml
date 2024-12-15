@@ -22,17 +22,17 @@ jobs:
     # Preparar la primera instancia EC2
     - name: Prepare EC2 Target Directory (Instance 1)
       run: |
-        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-54-224-204-67.compute-1.amazonaws.com "mkdir -p /home/ubuntu/project"
+        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-98-81-209-244.compute-1.amazonaws.com "mkdir -p /home/ubuntu/project"
 
     # Copiar los archivos a la primera instancia EC2
     - name: Copy Project Files to EC2 (Instance 1)
       run: |
-        scp -o StrictHostKeyChecking=no -i private-key.pem -r ./* ubuntu@ec2-54-224-204-67.compute-1.amazonaws.com:/home/ubuntu/project/
+        scp -o StrictHostKeyChecking=no -i private-key.pem -r ./* ubuntu@ec2-98-81-209-244.compute-1.amazonaws.com:/home/ubuntu/project/
 
     # Desplegar aplicación en la primera instancia EC2
     - name: Deploy Application on EC2 (Instance 1)
       run: |
-        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-54-224-204-67.compute-1.amazonaws.com << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-98-81-209-244.compute-1.amazonaws.com << 'EOF'
           # Update and install necessary packages
           sudo apt update -y
           sudo apt install nginx git -y
@@ -52,22 +52,22 @@ jobs:
     # Verificar despliegue en la primera instancia EC2
     - name: Verify Deployment (Instance 1)
       run: |
-        curl http://ec2-54-224-204-67.compute-1.amazonaws.com
+        curl http://ec2-98-81-209-244.compute-1.amazonaws.com
 
     # Preparar la segunda instancia EC2
     - name: Prepare EC2 Target Directory (Instance 2)
       run: |
-        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-52-22-29-222.compute-1.amazonaws.com "mkdir -p /home/ubuntu/project"
+        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-34-229-107-14.compute-1.amazonaws.com "mkdir -p /home/ubuntu/project"
 
     # Copiar los archivos a la segunda instancia EC2
     - name: Copy Project Files to EC2 (Instance 2)
       run: |
-        scp -o StrictHostKeyChecking=no -i private-key.pem -r ./* ubuntu@ec2-52-22-29-222.compute-1.amazonaws.com:/home/ubuntu/project/
+        scp -o StrictHostKeyChecking=no -i private-key.pem -r ./* ubuntu@ec2-34-229-107-14.compute-1.amazonaws.com:/home/ubuntu/project/
 
     # Desplegar aplicación en la segunda instancia EC2
     - name: Deploy Application on EC2 (Instance 2)
       run: |
-        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-52-22-29-222.compute-1.amazonaws.com << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-34-229-107-14.compute-1.amazonaws.com << 'EOF'
           # Update and install necessary packages
           sudo apt update -y
           sudo apt install nginx git -y
@@ -87,4 +87,4 @@ jobs:
     # Verificar despliegue en la segunda instancia EC2
     - name: Verify Deployment (Instance 2)
       run: |
-        curl http://ec2-52-22-29-222.compute-1.amazonaws.com
+        curl http://ec2-34-229-107-14.compute-1.amazonaws.com

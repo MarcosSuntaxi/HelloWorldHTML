@@ -10,20 +10,11 @@
     <h2>Sistemas de Información</h2>
     
     <!-- Mostrar la IP pública de la instancia -->
-    <h1>Hello world to 2 QA using LoadBalancer : <strong id="instance-ip">Cargando...</strong></h1>
-
-    <script>
-      // Obtener la dirección IPv4 pública de la instancia EC2
-      fetch('http://169.254.169.254/latest/meta-data/public-ipv4')
-        .then(response => response.text())
-        .then(ip => {
-          // Insertar la IP pública en el lugar correspondiente
-          document.getElementById('instance-ip').textContent = ip;
-        })
-        .catch(error => {
-          console.error('Error obteniendo la IP pública:', error);
-          document.getElementById('instance-ip').textContent = 'No se pudo obtener la IP.';
-        });
-    </script>
+    <h1>Hello world to 2 QA using LoadBalancer : </h1>
+    
+    <!-- Este elemento se actualizará con la dirección DNS pública de la instancia -->
+    <h2>Deployed on: <span id="instance-dns"></span></h2>
+    
 </body>
 </html>
+

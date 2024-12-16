@@ -9,11 +9,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # Clonar el repositorio
     - name: Checkout Repository
       uses: actions/checkout@v3
       with:
         repository: "MarcosSuntaxi/HelloWorldHTML"
 
+    # Configurar la clave SSH
     - name: Set up SSH Key
       run: |
         echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > private-key.pem
@@ -24,7 +26,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-35-170-200-120.compute-1.amazonaws.com "mkdir -p /home/ubuntu/project"
 
-    # Copiar los archivos a la primera instancia EC2
+    # Copiar archivos a la primera instancia EC2
     - name: Copy Project Files to EC2 (Instance 1)
       run: |
         scp -o StrictHostKeyChecking=no -i private-key.pem -r ./* ubuntu@ec2-35-170-200-120.compute-1.amazonaws.com:/home/ubuntu/project/
@@ -33,15 +35,16 @@ jobs:
     - name: Deploy Application on EC2 (Instance 1)
       run: |
         ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-35-170-200-120.compute-1.amazonaws.com << 'EOF'
-          # Update and install necessary packages
           sudo apt update -y
           sudo apt install nginx git -y
 
           # Clean old files in Nginx directory
           sudo rm -rf /var/www/html/*
+          sudo rm -rf /var/cache/nginx/*
 
           # Modify index.html to include public IP of this instance
           cd /home/ubuntu/project
+          git pull origin SecondBranch
           sed -i "s/<\/body>/\n    <h2>Deployed on: 35.170.200.120<\/h2>\n<\/body>/" index.html
 
           # Copy project files to the Nginx root directory
@@ -61,7 +64,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-54-175-90-126.compute-1.amazonaws.com "mkdir -p /home/ubuntu/project"
 
-    # Copiar los archivos a la segunda instancia EC2
+    # Copiar archivos a la segunda instancia EC2
     - name: Copy Project Files to EC2 (Instance 2)
       run: |
         scp -o StrictHostKeyChecking=no -i private-key.pem -r ./* ubuntu@ec2-54-175-90-126.compute-1.amazonaws.com:/home/ubuntu/project/
@@ -70,15 +73,16 @@ jobs:
     - name: Deploy Application on EC2 (Instance 2)
       run: |
         ssh -o StrictHostKeyChecking=no -i private-key.pem ubuntu@ec2-54-175-90-126.compute-1.amazonaws.com << 'EOF'
-          # Update and install necessary packages
           sudo apt update -y
           sudo apt install nginx git -y
 
           # Clean old files in Nginx directory
           sudo rm -rf /var/www/html/*
+          sudo rm -rf /var/cache/nginx/*
 
           # Modify index.html to include public IP of this instance
           cd /home/ubuntu/project
+          git pull origin SecondBranch
           sed -i "s/<\/body>/\n    <h2>Deployed on: 54.175.90.126<\/h2>\n<\/body>/" index.html
 
           # Copy project files to the Nginx root directory

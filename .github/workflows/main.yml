@@ -39,11 +39,7 @@ jobs:
 
           # Modify index.html to include public DNS of this instance
           cd /home/ubuntu/project
-          # Extraer solo la dirección IP de la DNS pública
-          INSTANCE_IP="35.170.200.120"
-
-          # Modificar el archivo index.html
-          sed -i "s/<span id=\"instance-dns\"><\\/span>/${INSTANCE_IP}/" index.html
+          sed -i "s/<\/body>/\n    <h2>Deployed on: ec2-35-170-200-120.compute-1.amazonaws.com<\/h2>\n<\/body>/" index.html
 
           # Copy project files to the Nginx root directory
           sudo cp -r /home/ubuntu/project/* /var/www/html/
@@ -78,11 +74,7 @@ jobs:
 
           # Modify index.html to include public DNS of this instance
           cd /home/ubuntu/project
-          # Extraer solo la dirección IP de la DNS pública
-          INSTANCE_IP="54.175.90.126"
-
-          # Modificar el archivo index.html
-          sed -i "s/<span id=\"instance-dns\"><\\/span>/${INSTANCE_IP}/" index.html
+          sed -i "s/<\/body>/\n    <h2>Deployed on: ec2-54-175-90-126.compute-1.amazonaws.com<\/h2>\n<\/body>/" index.html
 
           # Copy project files to the Nginx root directory
           sudo cp -r /home/ubuntu/project/* /var/www/html/
